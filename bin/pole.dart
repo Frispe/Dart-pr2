@@ -11,7 +11,8 @@ class Pole{
         pole[x][y + i] = 'K'; 
         ship.positions.add([x, y + i]);
       }
-    } else {
+    }
+    else {
       for (int i = 0; i < ship.size; i++) {
         pole[x + i][y] = 'K';
         ship.positions.add([x + i, y]);

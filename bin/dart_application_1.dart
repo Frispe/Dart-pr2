@@ -7,38 +7,39 @@ void main() {
   game.play();
 }
 
-class Main{
-  //поля
+class Main {
+  // Поля
   Pole pole1 = Pole();
   Pole pole2 = Pole();
-  //счеты
-  int schet1 = 0; 
+  // Счеты
+  int schet1 = 0;
   int schet2 = 0;
 
-  void rasstanovka_na_pole(Pole board, String player){
+  void rasstanovka_na_pole(Pole board, String player) {
     print("\n$player расставляет корабли");
     List<int> korabl_sizes = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1];
-    for (int size in korabl_sizes){
+    for (int size in korabl_sizes) {
       bool placed = false;
-      while (!placed){
+      while (!placed) {
         print('\nРазмести корабль размером $size.');
-        print('Введите координаты по горизонтали и вертикали, а также направление (0 - горизонтально, 1 - вертикально):');
+        print(
+            'Введите координаты по горизонтали и вертикали, а также направление (0 - горизонтально, 1 - вертикально):');
         try {
           var vvod = stdin.readLineSync()!.split(' ');
           if (vvod.length != 3) {
-            throw FormatException('ведите 3 значения: x, y и направление.');
+            throw FormatException('Введите 3 значения: x, y и направление.');
           }
           int x = int.parse(vvod[0]) - 1;
-
           int y = int.parse(vvod[1]) - 1;
           String direction = vvod[2].toLowerCase();
 
-          if (x < 0 || x >= Pole.size || y < 0 || y >= Pole.size){
-            throw FormatException('Вводи корды от 1 до 10');
+          if (x < 0 || x >= Pole.size || y < 0 || y >= Pole.size) {
+            throw FormatException('Вводите координаты от 1 до 10.');
           }
 
           if (direction != '0' && direction != '1') {
-            throw FormatException('Направление должно быть 0 - горизонтально или 1 - вертикально.');
+            throw FormatException(
+                'Направление должно быть 0 - горизонтально или 1 - вертикально.');
           }
 
           bool isHorizontal = direction == '0';
@@ -47,29 +48,25 @@ class Main{
             board.rasstanovka(Korabl(size), x, y, isHorizontal);
             placed = true;
             board.display();
+          } else {
+            print('Тут нельзя поставить корабль!!!');
           }
-          else {
-            print('Тут нельзя поставиьт корабль!!!');
-          }
-        }
-        on FormatException catch (e) {
+        } on FormatException catch (e) {
           print('Ошибка: ${e.message}');
-        }
-        catch (e) {
-          print('Неправильно ввел данные -_-');
+        } catch (e) {
+          print('Неправильно введены данные -_-');
         }
       }
     }
   }
 
   bool proverka(Pole board, int x, int y, int size, bool gorizontalno) {
-    if (gorizontalno = true) {
+    if (gorizontalno) {
       if (y + size > Pole.size) return false;
       for (int i = 0; i < size; i++) {
         if (board.pole[x][y + i] != ' ') return false;
       }
-    }
-    else {
+    } else {
       if (x + size > Pole.size) return false;
       for (int i = 0; i < size; i++) {
         if (board.pole[x + i][y] != ' ') return false;
@@ -78,94 +75,101 @@ class Main{
     return true;
   }
 
-  void play(){
+  void play() {
     rasstanovka_na_pole(pole1, 'Игрок 1');
     rasstanovka_na_pole(pole2, 'Игрок 2');
 
     bool xod1 = true;
 
-    while (true){
-      if (xod1){
+    while (true) {
+      if (xod1) {
         print('\nИгрок 1 ходит');
         print('Поле противника:');
         pole2.display(sp_korabli: true);
         print('\nСчет: Игрок 1 - $schet1, Игрок 2 - $schet2');
         print('Введите координаты для выстрела (x y):');
-        try{
+
+        try {
           var input = stdin.readLineSync()!.split(' ');
           if (input.length != 2) {
-            throw FormatException('Некорректный ввод. Введите 2 значения: x и y.');
+            print("Некорректный ввод. Введите 2 значения: x и y.");
+            continue;
           }
 
           int x = int.parse(input[0]) - 1;
           int y = int.parse(input[1]) - 1;
 
-          if (x < 0 || x >= Pole.size || y < 0 || y >= Pole.size){
-            throw FormatException('Координаты должны быть от 1 до 10.');
+          if (x < 0 || x >= Pole.size || y < 0 || y >= Pole.size) {
+            print("Координаты должны быть от 1 до 10.");
+            continue;
           }
 
-          if (pole2.popal_ili_net(x, y)){
+          if (pole2.popal_ili_net(x, y)) {
             print('Попадание!');
             schet1++;
-            if (pole2.vseUbiti()){
+            if (pole2.vseUbiti()) {
               print('Игрок 1 выиграл!');
               print('Финальный счет: Игрок 1 - $schet1, Игрок 2 - $schet2');
               print('У победителя осталось ${pole1.ostalosKorabley()} кораблей.');
+              stata(schet1, pole1.ostalosKorabley(), 'Игрок 1');
               break;
             }
-          }
-          else{
+          } else {
             print('Промах!');
           }
-        }
-        on FormatException catch (e){
-          print('Ошибка: ${e.message}');
-        }
-        catch (e){
+        } catch (e) {
           print('Ошибка: некорректный ввод. Введите числа для координат.');
         }
-      }
-      else{
+      } else {
         print('\nИгрок 2, ваш ход!');
         print('Поле противника:');
         pole1.display(sp_korabli: true);
         print('\nСчет: Игрок 1 - $schet1, Игрок 2 - $schet2');
         print('Введите координаты для выстрела (x y):');
-        try{
+
+        try {
           var input = stdin.readLineSync()!.split(' ');
-          if (input.length != 2){
-            throw FormatException('Некорректный ввод. Введите 2 значения: x и y.');
+          if (input.length != 2) {
+            print("Некорректный ввод. Введите 2 значения: x и y.");
+            continue;
           }
 
           int x = int.parse(input[0]) - 1;
           int y = int.parse(input[1]) - 1;
 
-          if (x < 0 || x >= Pole.size || y < 0 || y >= Pole.size){
-            throw FormatException('Координаты должны быть от 1 до 10.');
+          if (x < 0 || x >= Pole.size || y < 0 || y >= Pole.size) {
+            print("Координаты должны быть от 1 до 10.");
+            continue;
           }
 
-          if (pole1.popal_ili_net(x, y)){
+          if (pole1.popal_ili_net(x, y)) {
             print('Попадание!');
             schet2++;
-            if (pole1.vseUbiti()){
+            if (pole1.vseUbiti()) {
               print('Игрок 2 выиграл!');
               print('Финальный счет: Игрок 1 - $schet1, Игрок 2 - $schet2');
               print('У победителя осталось ${pole2.ostalosKorabley()} кораблей.');
+              stata(schet2, pole2.ostalosKorabley(), 'Игрок 2');
               break;
             }
-          }
-          else{
+          } else {
             print('Промах!');
           }
-        }
-        on FormatException catch (e) {
-          print('Ошибка: ${e.message}');
-        }
-        catch (e) {
+        } catch (e) {
           print('Ошибка: некорректный ввод. Введите числа для координат.');
         }
       }
       xod1 = !xod1;
     }
+  }
+
+  void stata(int winnerScore, int remainingShips, String winnerName) {
+    final directory = Directory('stata');
+    if (!directory.existsSync()) {
+      directory.createSync();
+    }
+
+    final file = File('${directory.path}/statistika.txt');
+    file.writeAsStringSync('Победитель: $winnerName\n Финальный счет: $winnerScore\n Оставшиеся корабли: $remainingShips');
   }
 }
